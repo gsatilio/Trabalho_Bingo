@@ -77,9 +77,9 @@ void CriarCartelas(int jogador, int quantidade)
 {
     bool ResetaPopular = false;
     int contador = 0;
-    int LinhasCartela = (quantidade * 4);
+    int LinhasCartela = (quantidade * 5);
 
-    for (int linha = 0; linha <= LinhasCartela; linha++)
+    for (int linha = 0; linha < LinhasCartela; linha++)
     {
         for (int coluna = 0; coluna < ColunasReal; coluna++)
         {
@@ -89,18 +89,17 @@ void CriarCartelas(int jogador, int quantidade)
                     if (contador == 4)
                     {
                         ResetaPopular = true;
-                        break;
                     }
                     MatrizCartelas[LinhaTotal, coluna] = SorteioCartela(0, ResetaPopular);
                     break;
                 case 5:
                     if (LinhaTotal == LinhaCartelaPessoa)
                     {
-                        MatrizCartelas[LinhaTotal, coluna] = jogador;
+                        MatrizCartelas[LinhaTotal, coluna] = jogador;       // ID JOGADOR
                     }
                     else if (LinhaTotal == LinhaCartelaPessoa + 1)
                     {
-                        MatrizCartelas[LinhaTotal, coluna] = Id_Cartela;
+                        MatrizCartelas[LinhaTotal, coluna] = Id_Cartela;    // ID CARTELA
                         LinhaCartelaPessoa += 5;
                         Id_Cartela++;
                     }
@@ -141,25 +140,50 @@ int SorteioCartela(int tipo, bool ResetaPopular)
             ContadorSorteados++;                                // Aumenta contador de sorteado (controlador do indice do vetor)
             break;
     }
+    if(sorteado == 0)
+    {
+        Console.WriteLine("");
+    }
     return sorteado;                                        // Retorna o valor
+}
+
+MenuJogadores();
+imprimirCartelas();
+
+void imprimirCartelas()
+{
+    int pularlinha = 0;
+
+
+    Console.WriteLine("\nCartela");
+    for (int linha = 0; linha < LinhaTotal; linha++)
+    {
+        if(pularlinha == 5)
+        {
+            Console.WriteLine();
+            pularlinha = 0;
+        }
+        Console.WriteLine();
+        for (int coluna = 0; coluna < ColunasReal; coluna++)
+        {
+            if(coluna == 5)
+            {
+                Console.Write("[" + MatrizCartelas[linha, coluna].ToString().PadLeft(2, '0') + "]");
+            } else
+            {
+                Console.Write(MatrizCartelas[linha, coluna].ToString().PadLeft(2, '0') + " ");
+            }
+        }
+        pularlinha++;
+    }
 }
 
 
 
-
-
-
-
-
-
-
-
-///// debugar
-MenuJogadores();
-
-
+Console.ReadKey();
 
 // print debugar
+/*
 Console.WriteLine("\nRoleta");
 for (int i = 0; i < Roleta.Length; i++)
 {
@@ -181,5 +205,4 @@ for (int linha = 0; linha < Linhas; linha++)
         Console.Write(MatrizCartelas[linha, coluna] + " "); 
     }
 }
-
-Console.ReadKey();
+*/
