@@ -16,15 +16,16 @@ int Id_JogadorControl = 0, Id_CartelaControl = 0, LinhaPessoaControl = 0, LinhaC
 int Id_JogadorLinha = 0, Id_JogadorColuna = 0, Id_JogadorBingo = 0;
 int Id_CartelaGeral = 0;
 int CodigoJogadorCartela = 0;
-
+int ContadorResetNumeros = 0;
 double EncontraJogador = 0;
 
 bool Bingo = false, LinhaOK = false, ColunaOK = false;
 
 //Vetores
 int[] Roleta = new int[99];
-int[] RoletaGeral = new int[99];
 int[] RoletaSorteados = new int[99];
+
+int[] RoletaCartela = new int[99];
 
 //Matrizes
 int[,] MatrizCartelas = new int[Linhas, Colunas];
@@ -41,7 +42,7 @@ void MenuJogadores()
         Console.WriteLine("Quantos jogadores?");
         Jogadores = int.Parse(Console.ReadLine());
     }
-
+    EnumerarCartelas();
     while (Id_Jogador <= Jogadores)
     {
         while (QtdeCartela <= 0)
@@ -50,7 +51,6 @@ void MenuJogadores()
             QtdeCartela = int.Parse(Console.ReadLine());
         }
 
-        EnumerarCartelas();
         // Vetor JogadoresRegistrados tem 100 casas (aqui salvo ID JOGADOR e QTDE CARTELAS)
         //JogadoresRegistrados[JogadorRegistradoIndice, 0] = Id_Jogador;
         //JogadoresRegistrados[JogadorRegistradoIndice, 1] = QtdeCartela;
@@ -74,28 +74,29 @@ void EnumerarRoleta()
 void EnumerarCartelas()
 {
     // Popula numeros de 1 a 99 no vetor Roleta
-    for (int i = 0; i < RoletaGeral.Length; i++)
+    for (int i = 0; i < 99; i++)
     {
-        RoletaGeral[i] = i + 1;
+        RoletaCartela[i] = i+1;
     }
 }
 void CriarCartelas(int jogador, int quantidade)
 {
-    bool Resetar = false;
-    int ContadorResetNumeros = 0;
     int LinhasCartela = (quantidade * 5);
     for (int linha = 0; linha < LinhasCartela; linha++)
     {
+        //ContadorResetNumeros++;
+        //if (ContadorResetNumeros == 6)
+        //{
+        //    ContadorResetNumeros = 0;
+        //    Resetar = true;
+        //}
         for (int coluna = 0; coluna < Colunas; coluna++)
         {
             switch (coluna)
             {
                 case < 5:
-                    if (ContadorResetNumeros == 4)
-                    {
-                        Resetar = true;
-                    }
-                    MatrizCartelas[LinhaTotal, coluna] = PreencherCartela(Resetar);
+                    MatrizCartelas[LinhaTotal, coluna] = PreencherCartela();
+
                     break;
                 case 5:
                     if (LinhaTotal == LinhaCartelaPessoa)
@@ -111,7 +112,6 @@ void CriarCartelas(int jogador, int quantidade)
                     }
                     break;
             }
-            ContadorResetNumeros++;
         }
         LinhaTotal++;
     }
@@ -128,20 +128,33 @@ void ClonarMatrizCartelas()
         }
     }
 }
-int PreencherCartela(bool Resetar)
+int PreencherCartela()
 {
     int i = 0, sorteado = 0;
-    if (Resetar)
+    if (ContadorResetNumeros == 25)
     {
+        ContadorResetNumeros = 0;
         EnumerarCartelas();
     }
     while (sorteado == 0) // Enquanto numero sorteado for zero
     {
-        i = new Random().Next(1, 98);                   // Pega um indice aleatorio entre 0 e 99
-        sorteado = RoletaGeral[i];                           // Sorteado recebe o numero da roleta nesse indice
+        i = new Random().Next(1, 98);    
+        sorteado = RoletaCartela[i];     
+        
+        if (sorteado > 0)
+        {
+            RoletaCartela[i] = 0;
+        } else
+        {
+            sorteado = 0;
+        }
     }
+
+    ContadorResetNumeros++;
     return sorteado;
 }
+
+
 void imprimirCartelas()
 {
     int pularlinha = 0;
@@ -186,7 +199,8 @@ void imprimirCartelas()
             }
             else
             {
-                Console.Write(MatrizCartelasClone[linha, coluna].ToString().PadLeft(2, '0') + " ");
+                //Console.Write(MatrizCartelasClone[linha, coluna].ToString().PadLeft(2, '0') + " ");
+                Console.Write(MatrizCartelasClone[linha, coluna] + " ");
             }
         }
         pularlinha++;
@@ -212,9 +226,7 @@ void Sortear()
 }
 void VerificarSorteado()
 {
-    int ColunaControle = 0;
-
-
+    int ControlePosicaoLinha = 0;
     while (ContadorSorteados < 99 && !Bingo)
     {
         if (LinhaTotalControl > 0)
@@ -235,24 +247,29 @@ void VerificarSorteado()
                     case < 5: // de 0 a 4 = Numeros da cartela
                         if (MatrizCartelasClone[linha, coluna] == NroSorteado)
                         {
-                            MatrizCartelasClone[linha, coluna] = 0; // se localizar o nro sorteado, altera para 0 no vetor clonado
+                            MatrizCartelasClone[linha, coluna] = (MatrizCartelasClone[linha, coluna] * -1); // se localizar o nro sorteado, altera para 0 no vetor clonado
+                            //MatrizCartelasClone[linha, coluna] = 0; // se localizar o nro sorteado, altera para 0 no vetor clonado
                         }
                         break;
                     case 5: // 5 = coluna dos controles
-                        if (!LinhaOK)
-                        {
-                            ConferirLinha(LinhaTotalControl, LinhaCartelaPessoaControl, coluna);
-                        }
+                        //if (!LinhaOK)
+                        //{
+                        //    ConferirLinha(LinhaTotalControl, LinhaCartelaPessoaControl, coluna);
+                        //}
                         break;
                 }
             }
-            if (!ColunaOK)
+            //if (!ColunaOK)
+            //{
+            //    VerificarColuna(LinhaTotalControl, ControlePosicaoLinha);
+            //}
+            ControlePosicaoLinha++;
+            if (ControlePosicaoLinha == 4)
             {
-                VerificarColuna(ColunaControle, LinhaTotalControl);
+                ControlePosicaoLinha = 0;
             }
-            LinhaTotalControl++;
+            LinhaTotalControl++;// nao mexer
         }
-        ColunaControle += 5;
     }
 }
 void ConferirLinha(int LinhaControle, int LinhaCartelaControle, int ColunaAtual)
@@ -304,20 +321,64 @@ void VerificarLinha(int codLinha)
 }
 
 
-void VerificarColuna(int codLinha, int codColuna)
+void VerificarColuna(int codLinha, int controlePosicao)
 {
     int ValorAnterior, ValorAtual, contador = 0;
-
-    for (int linhaAtual = codLinha; linhaAtual < LinhaTotalAux; linhaAtual++)
+    int codColuna = 0, codLinhaAux = 0;
+    codLinhaAux = codLinha;
+    // recebo linha, verifico a linha em cada coluna
+    while (codColuna < 5)
     {
-        ValorAtual = MatrizCartelasClone[linhaAtual+1, codColuna];
-        ValorAnterior = MatrizCartelasClone[linhaAtual, codColuna];
-        if (ValorAtual == ValorAnterior)
+        switch (controlePosicao)
         {
-            contador++;
+            case 0: // primeira linha de uma cartela
+                for (int i = 1; (i < 5); i++)
+                {
+                    codLinhaAux++;
+                    if (codLinhaAux < LinhaTotal)
+                    {
+                        ValorAnterior = MatrizCartelasClone[codLinhaAux - 1, codColuna];
+                        ValorAtual = MatrizCartelasClone[codLinhaAux, codColuna];
+
+                        if (ValorAtual == ValorAnterior)
+                        {
+                            contador++;
+                        }
+                    }
+                }
+                break;
+            case 1:
+
+                break;
+            case 2:
+
+                break;
+            case 3:
+
+                break;
+            case 4:
+
+                break;
         }
+        codColuna++;
     }
-    LinhaTotalAux += 5;
+
+
+
+    for (int codcoluna = 0; codcoluna < 5; codcoluna++)
+    {
+        while (codLinha < LinhaTotalAux)
+        {
+            ValorAtual = MatrizCartelasClone[codLinha + 1, codcoluna];
+            ValorAnterior = MatrizCartelasClone[codLinha, codcoluna];
+            if (ValorAtual == ValorAnterior)
+            {
+                contador++;
+            }
+            codLinha++;
+        }
+        LinhaTotalAux += 5;
+    }
 
     if (contador == 4 && !ColunaOK)
     {
