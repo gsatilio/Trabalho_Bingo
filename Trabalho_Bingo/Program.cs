@@ -13,7 +13,7 @@ int Jogadores = 0, Cartelas = 0;
 int LinhaCartelaPessoa = 0, LinhaTotal = 0;
 int Id_Jogador = 0, Id_Cartela = 0, NroSorteado = 0;
 
-bool Bingo = false, DeuLinha = false, DeuColuna = false;
+bool Bingo = false, LinhaOK = false, ColunaOK = false;
 
 //Vetores
 int[] Roleta = new int[99];
@@ -23,8 +23,8 @@ int[] RoletaSorteados = new int[99];
 //Matrizes
 int[,] MatrizCartelas = new int[Linhas, Colunas];
 int[,] MatrizCartelasClone = new int[0, 0];
-int[,] JogadoresRegistrados = new int[50,3];
-int[,] MatrizNumeros = new int[0,100];
+int[,] JogadoresRegistrados = new int[50, 3];
+int[,] MatrizNumeros = new int[0, 100];
 
 void EnumerarCartelas()
 {
@@ -52,19 +52,19 @@ void MenuJogadores()
         Jogadores = int.Parse(Console.ReadLine());
     }
 
-    while(Id_Jogador < Jogadores)
+    while (Id_Jogador < Jogadores)
     {
         while (QtdeCartela <= 0)
         {
-            Console.WriteLine($"Quantas cartelas para o {Id_Jogador+1}o jogador?");
+            Console.WriteLine($"Quantas cartelas para o {Id_Jogador + 1}o jogador?");
             QtdeCartela = int.Parse(Console.ReadLine());
         }
 
         EnumerarCartelas();
         // Vetor JogadoresRegistrados tem 100 casas (aqui salvo ID JOGADOR e QTDE CARTELAS)
-        JogadoresRegistrados[JogadorRegistradoIndice,0] = Id_Jogador;
-        JogadoresRegistrados[JogadorRegistradoIndice,1] = QtdeCartela;
-        JogadoresRegistrados[JogadorRegistradoIndice,2] = 1;
+        JogadoresRegistrados[JogadorRegistradoIndice, 0] = Id_Jogador;
+        JogadoresRegistrados[JogadorRegistradoIndice, 1] = QtdeCartela;
+        JogadoresRegistrados[JogadorRegistradoIndice, 2] = 1;
         JogadorRegistradoIndice++;
 
         Cartelas += QtdeCartela;
@@ -119,7 +119,7 @@ int PreencherCartela(bool Resetar)
     }
     while (sorteado == 0) // Enquanto numero sorteado for zero
     {
-        i = new Random().Next(1, 99);                   // Pega um indice aleatorio entre 0 e 99
+        i = new Random().Next(1, 98);                   // Pega um indice aleatorio entre 0 e 99
         sorteado = RoletaGeral[i];                           // Sorteado recebe o numero da roleta nesse indice
     }
     return sorteado;
@@ -185,31 +185,36 @@ void ClonarMatrizCartelas()
     }
 }
 
-MenuJogadores();
-ClonarMatrizCartelas();
-EnumerarRoleta();
-
 
 void Sortear()
 {
-    int i = 0, sorteado = 0;
-    while (sorteado == 0 && ContadorSorteados < 99)     // Enquanto numero sorteado for zero e sorteio ate 99
+    int i = 0, Sorteio = 0;
+    bool Sorteou = false;
+    for(int tentativas = 0; (tentativas < 99 && !Sorteou); tentativas++)
     {
-        i = new Random().Next(1, 99);                   // Pega um indice aleatorio entre 0 e 99
-        sorteado = Roleta[i];                           // Sorteado recebe o numero da roleta nesse indice
-        RoletaSorteados[ContadorSorteados] = sorteado;  // Salva esse numero no vetor de sorteados
+        while (Sorteio == 0)     // Enquanto numero sorteado for zero e sorteio ate 99
+        {
+            i = new Random().Next(0, 99);                   // Pega um indice aleatorio entre 0 e 99
+            Sorteio = Roleta[i];                           // Sorteado recebe o numero da roleta nesse indice
+        }                             // Aumenta contador de sorteado (controlador do indice do vetor)
+        RoletaSorteados[ContadorSorteados] = Sorteio;  // Salva esse numero no vetor de sorteados
+        NroSorteado = Sorteio;
+        ContadorSorteados++;
         Roleta[i] = 0;                                  // Muda o valor do vetor no indice selecionado, para zero
+        Sorteou = true;
     }
-    NroSorteado = sorteado;
-    ContadorSorteados++;                                // Aumenta contador de sorteado (controlador do indice do vetor)
 }
 
 void VerificarSorteado()
 {
     int achou = 0;
-    bool OKLinha = false;
-    while (ContadorSorteados < 100) 
+    while (ContadorSorteados < 99)
     {
+        Sortear(); // sorteia assim que acabam as linhas e contador ainda for menor que 100
+        if (ContadorSorteados == 99)
+        {
+            Console.WriteLine();
+        }
         for (int linha = 0; linha < LinhaTotal; linha++) // varre todas as linhas
         {
             for (int coluna = 0; coluna < Colunas; coluna++) // varre as colunas de 0 a 4
@@ -221,68 +226,69 @@ void VerificarSorteado()
                         achou++;
                         MatrizCartelasClone[linha, coluna] = 0; // se localizar o nro sorteado, altera para 0 no vetor clonado
                     }
-                    if (!OKLinha)
-                    {
-                        OKLinha = VerificarLinha(); // apos varrer a linha verifica se alguem deu linha
-                    }
+                }
+                if (linha == 5 && coluna == 5)
+                {
+                    Console.WriteLine();
                 }
             }
-            if (OKLinha)
-            {
-                Bingo = true;
-            }
+            //VerificarLinha();
         }
-        Sortear(); // sorteia assim que acabam as linhas e contador ainda for menor que 100
     }
 }
 
-bool VerificarLinha()
+void VerificarLinha()
 {
-    bool DeuLinha = false;
     int ValorAnterior = 0, ValorAtual = 0;
     for (int linha = 0; linha < LinhaTotal; linha++)
     {
         for (int coluna = 0; coluna < Colunas; coluna++)
         {
-            if(coluna < 5)
+            if (coluna < 5)
             {
                 ValorAtual = MatrizCartelasClone[linha, coluna];
                 if (ValorAtual == ValorAnterior)
                 {
-                    DeuLinha = true;
+                    LinhaOK = true;
                 }
                 else
                 {
-                    DeuLinha = false;
+                    LinhaOK = false;
                 }
                 ValorAnterior = ValorAtual;
             }
         }
         ValorAtual = 0;
     }
-    return DeuLinha;
+    // return DeuLinha;
 
-    //if (DeuLinha && !Bingo)
-    //{
-    //    Bingo = true;
-    //    Console.WriteLine($"\nbinnnnnnnnnnngo:");
-    //}
+    if (LinhaOK && !Bingo)
+    {
+        Bingo = true;
+        Console.WriteLine($"\nbinnnnnnnnnnngo:");
+    }
 }
+
+
+
+MenuJogadores();
+ClonarMatrizCartelas();
+EnumerarRoleta();
+
 
 // Sorteia
 for (int i = 0; i < 99; i++)
-{ 
-    //while (!Bingo)
-    //{
-        VerificarSorteado();
-    //}
+{
+    VerificarSorteado();
 }
 
+
+
 Console.WriteLine("\nSorteados");
-//for (int i = 0; i < RoletaSorteados.Length; i++)
-//{
-//    Console.Write(RoletaSorteados[i] + " ");
-//}
+for (int i = 0; i < RoletaSorteados.Length; i++)
+{
+    Console.Write(RoletaSorteados[i] + " ");
+}
 
 imprimirCartelas();
 
