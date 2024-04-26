@@ -9,60 +9,72 @@ X | X | X | X | X | V (0 ou 1)
 //Variaveis
 int ContadorSorteados = 0;
 int Linhas = 100, Colunas = 6; // Estrutura 5x5 com + 1 coluna pra salvar dados
-int Jogadores = 0, Cartelas = 0;
-int LinhaCartelaPessoa = 0, LinhaTotal = 0, LinhaTotalAux = 4;
-int Id_Jogador = 1, Id_Cartela = 0, NroSorteado = 0;
-int Id_JogadorControl = 0, Id_CartelaControl = 0, LinhaPessoaControl = 0, LinhaCartelaPessoaControl = 0, LinhaTotalControl = 0;
-int Id_JogadorLinha = 0, Id_JogadorColuna = 0, Id_JogadorBingo = 0;
-int Id_CartelaGeral = 0;
+int Jogadores = 0;
+int LinhaCartelaPessoa = 0, LinhaTotal = 0, LinhaControleCartela = 0;
+int Id_Jogador = 0, NroSorteado = 0, LinhaTotalControl = 0;
 int CodigoJogadorCartela = 0;
 int ContadorResetNumeros = 0;
-double EncontraJogador = 0;
 
 bool Bingo = false, LinhaOK = false, ColunaOK = false;
 
 //Vetores
 int[] Roleta = new int[99];
 int[] RoletaSorteados = new int[99];
-
 int[] RoletaCartela = new int[99];
 
 //Matrizes
 int[,] MatrizCartelas = new int[Linhas, Colunas];
-int[,] MatrizCartelasClone = new int[0, 0];
-int[,] JogadoresRegistrados = new int[50, 3];
+int[,] JogadoresRegistrados = new int[10, 3];
 int[,] MatrizNumeros = new int[0, 100];
 
 void MenuJogadores()
 {
     int QtdeCartela = 0;
-    int JogadorRegistradoIndice = 0;
+    int jogador_temp = 0;
+    int qtdetotal_temp = 0;
+    //int JogadorRegistradoIndice = 0;
     while (Jogadores <= 0)
     {
         Console.WriteLine("Quantos jogadores?");
         Jogadores = int.Parse(Console.ReadLine());
     }
     EnumerarCartelas();
-    while (Id_Jogador <= Jogadores)
+    while (Id_Jogador < Jogadores)
     {
         while (QtdeCartela <= 0)
         {
-            Console.WriteLine($"Quantas cartelas para o {Id_Jogador}o jogador?");
+            Console.WriteLine($"Quantas cartelas para o {Id_Jogador + 1}o jogador?");
             QtdeCartela = int.Parse(Console.ReadLine());
         }
 
         // Vetor JogadoresRegistrados tem 100 casas (aqui salvo ID JOGADOR e QTDE CARTELAS)
-        //JogadoresRegistrados[JogadorRegistradoIndice, 0] = Id_Jogador;
-        //JogadoresRegistrados[JogadorRegistradoIndice, 1] = QtdeCartela;
-        //JogadoresRegistrados[JogadorRegistradoIndice, 2] = 1;
+        JogadoresRegistrados[jogador_temp, 0] = Id_Jogador + 1;
+        JogadoresRegistrados[jogador_temp, 1] = QtdeCartela;
         //JogadorRegistradoIndice++;
 
-        Cartelas += QtdeCartela;
-        CriarCartelas(Id_Jogador, QtdeCartela);
+        //Cartelas += QtdeCartela;
+        //CriarCartelas(Id_Jogador, QtdeCartela);
+        qtdetotal_temp += QtdeCartela;
         Id_Jogador++;
+        jogador_temp++;
         QtdeCartela = 0;
     }
+    LinhaTotal = (qtdetotal_temp * 5);
+    MatrizCartelas = new int[LinhaTotal, 6];
+    GeradorCartelas();
 }
+
+void GeradorCartelas()
+{
+    int Jogador = 1, Qtde = 0;
+    for (int linha = 0; (linha < 20 && Jogador > 0); linha++)
+    {
+        Jogador = JogadoresRegistrados[linha, 0];
+        Qtde = JogadoresRegistrados[linha, 1];
+        CriarCartelas(Jogador, Qtde);
+    }
+}
+
 void EnumerarRoleta()
 {
     // Popula numeros de 1 a 99 no vetor Roleta
@@ -76,7 +88,7 @@ void EnumerarCartelas()
     // Popula numeros de 1 a 99 no vetor Roleta
     for (int i = 0; i < 99; i++)
     {
-        RoletaCartela[i] = i+1;
+        RoletaCartela[i] = i + 1;
     }
 }
 void CriarCartelas(int jogador, int quantidade)
@@ -84,50 +96,33 @@ void CriarCartelas(int jogador, int quantidade)
     int LinhasCartela = (quantidade * 5);
     for (int linha = 0; linha < LinhasCartela; linha++)
     {
-        //ContadorResetNumeros++;
-        //if (ContadorResetNumeros == 6)
-        //{
-        //    ContadorResetNumeros = 0;
-        //    Resetar = true;
-        //}
         for (int coluna = 0; coluna < Colunas; coluna++)
         {
             switch (coluna)
             {
                 case < 5:
-                    MatrizCartelas[LinhaTotal, coluna] = PreencherCartela();
-
+                    MatrizCartelas[LinhaControleCartela, coluna] = PreencherCartela();
                     break;
                 case 5:
-                    if (LinhaTotal == LinhaCartelaPessoa)
+                    if (LinhaControleCartela == LinhaCartelaPessoa)
                     {
-                        MatrizCartelas[LinhaTotal, coluna] = jogador;       // ID JOGADOR
+                        MatrizCartelas[LinhaControleCartela, coluna] = jogador;       // ID JOGADOR
                     }
-                    else if (LinhaTotal == LinhaCartelaPessoa + 1)
+                    else if (LinhaControleCartela == LinhaCartelaPessoa + 1)
                     {
                         CodigoJogadorCartela++;
-                        MatrizCartelas[LinhaTotal, coluna] = CodigoJogadorCartela;    // ID CARTELA
+                        MatrizCartelas[LinhaControleCartela, coluna] = CodigoJogadorCartela;    // ID CARTELA
                         LinhaCartelaPessoa += 5;
-                        Id_Cartela++;
+                        //Id_Cartela++;
                     }
                     break;
             }
         }
-        LinhaTotal++;
+        LinhaControleCartela++;
     }
     CodigoJogadorCartela = 0;
 }
-void ClonarMatrizCartelas()
-{
-    MatrizCartelasClone = new int[LinhaTotal, 6];
-    for (int linha = 0; linha < LinhaTotal; linha++)
-    {
-        for (int coluna = 0; coluna < Colunas; coluna++)
-        {
-            MatrizCartelasClone[linha, coluna] = MatrizCartelas[linha, coluna];
-        }
-    }
-}
+
 int PreencherCartela()
 {
     int i = 0, sorteado = 0;
@@ -138,13 +133,14 @@ int PreencherCartela()
     }
     while (sorteado == 0) // Enquanto numero sorteado for zero
     {
-        i = new Random().Next(1, 98);    
-        sorteado = RoletaCartela[i];     
-        
+        i = new Random().Next(1, 98);
+        sorteado = RoletaCartela[i];
+
         if (sorteado > 0)
         {
             RoletaCartela[i] = 0;
-        } else
+        }
+        else
         {
             sorteado = 0;
         }
@@ -153,13 +149,11 @@ int PreencherCartela()
     ContadorResetNumeros++;
     return sorteado;
 }
-
-
 void imprimirCartelas()
 {
     int pularlinha = 0;
 
-    Console.WriteLine("\nCartela Normal:");
+    Console.WriteLine("\nCartelas dos Jogadores:");
     for (int linha = 0; linha < LinhaTotal; linha++)
     {
         if (pularlinha == 5)
@@ -177,30 +171,6 @@ void imprimirCartelas()
             else
             {
                 Console.Write(MatrizCartelas[linha, coluna].ToString().PadLeft(2, '0') + " ");
-            }
-        }
-        pularlinha++;
-    }
-
-    Console.WriteLine("\nCartela Clonada:");
-    for (int linha = 0; linha < LinhaTotal; linha++)
-    {
-        if (pularlinha == 5)
-        {
-            Console.WriteLine();
-            pularlinha = 0;
-        }
-        Console.WriteLine();
-        for (int coluna = 0; coluna < Colunas; coluna++)
-        {
-            if (coluna == 5)
-            {
-                Console.Write("[" + MatrizCartelasClone[linha, coluna].ToString().PadLeft(2, '0') + "]");
-            }
-            else
-            {
-                //Console.Write(MatrizCartelasClone[linha, coluna].ToString().PadLeft(2, '0') + " ");
-                Console.Write(MatrizCartelasClone[linha, coluna] + " ");
             }
         }
         pularlinha++;
@@ -227,6 +197,11 @@ void Sortear()
 void VerificarSorteado()
 {
     int ControlePosicaoLinha = 0;
+    int LinhaIdJogador = 0;
+    int LinhaIdCartela = 0;
+    int LinhaAcertosCartela = 0;
+    int CartelaRodada = 0;
+    int NrosAcertados = 0;
     while (ContadorSorteados < 99 && !Bingo)
     {
         if (LinhaTotalControl > 0)
@@ -234,190 +209,152 @@ void VerificarSorteado()
             LinhaTotalControl = 0;
         }
         Sortear(); // sorteia assim que acabam as linhas e contador ainda for menor que 100
-        if (ContadorSorteados == 99)
-        {
-            Console.WriteLine();
-        }
         for (int linha = 0; linha < LinhaTotal; linha++) // varre todas as linhas
         {
+            switch (CartelaRodada)
+            {
+                case 0:
+                    LinhaIdJogador = linha;
+                    LinhaIdCartela = linha + 1;
+                    LinhaAcertosCartela = linha + 2;
+                    break;
+                case 5:
+                    LinhaIdJogador = linha;
+                    LinhaIdCartela = linha + 1;
+                    LinhaAcertosCartela = linha + 2;
+                    CartelaRodada = 0;
+                    break;
+            }
             for (int coluna = 0; coluna < Colunas; coluna++) // varre as colunas de 0 a 4
             {
                 switch (coluna)
                 {
                     case < 5: // de 0 a 4 = Numeros da cartela
-                        if (MatrizCartelasClone[linha, coluna] == NroSorteado)
+                        if (MatrizCartelas[linha, coluna] == NroSorteado)
                         {
-                            MatrizCartelasClone[linha, coluna] = (MatrizCartelasClone[linha, coluna] * -1); // se localizar o nro sorteado, altera para 0 no vetor clonado
-                            //MatrizCartelasClone[linha, coluna] = 0; // se localizar o nro sorteado, altera para 0 no vetor clonado
+                            MatrizCartelas[linha, coluna] = (MatrizCartelas[linha, coluna] * -1); // Ao acertar o sorteio de um numero, muda para negativo
+                            NrosAcertados = MatrizCartelas[LinhaAcertosCartela, 5];
+                            NrosAcertados++;
+                            if (NrosAcertados == 25)
+                            {
+                                Console.WriteLine();
+                            }
+                            MatrizCartelas[LinhaAcertosCartela, 5] = NrosAcertados; // se localizar o nro sorteado, altera para 0 no vetor clonado
                         }
-                        break;
-                    case 5: // 5 = coluna dos controles
-                        //if (!LinhaOK)
-                        //{
-                        //    ConferirLinha(LinhaTotalControl, LinhaCartelaPessoaControl, coluna);
-                        //}
+                        if (!LinhaOK)
+                        {
+                            VerificarResultado(linha, coluna, LinhaIdJogador, LinhaIdCartela, LinhaAcertosCartela, 0);
+                        }
+                        if (!ColunaOK)
+                        {
+                            VerificarResultado(linha, coluna, LinhaIdJogador, LinhaIdCartela, LinhaAcertosCartela, 1);
+                        }
+                        if (!Bingo)
+                        {
+                            VerificarResultado(linha, coluna, LinhaIdJogador, LinhaIdCartela, LinhaAcertosCartela, 2);
+                        }
                         break;
                 }
             }
-            //if (!ColunaOK)
-            //{
-            //    VerificarColuna(LinhaTotalControl, ControlePosicaoLinha);
-            //}
             ControlePosicaoLinha++;
             if (ControlePosicaoLinha == 4)
             {
                 ControlePosicaoLinha = 0;
             }
             LinhaTotalControl++;// nao mexer
+            CartelaRodada++;
         }
     }
 }
-void ConferirLinha(int LinhaControle, int LinhaCartelaControle, int ColunaAtual)
-{
-    if (LinhaControle == LinhaCartelaControle)
-    {
-        Id_JogadorControl = MatrizCartelasClone[LinhaControle, ColunaAtual];    // ID JOGADOR
-    }
-    else if (LinhaControle == LinhaCartelaControle + 1)
-    {
-        Id_CartelaControl = MatrizCartelas[LinhaControle, ColunaAtual];         // ID CARTELA
-        LinhaCartelaControle += 5;
-    }
 
-    VerificarLinha(LinhaControle); // apos varrer a linha verifica se alguem deu linha
-    if (LinhaOK)
-    {
-        Console.WriteLine();
-    }
-}
-void VerificarLinha(int codLinha)
+void VerificarResultado(int linha, int coluna, int LinhaIdJogador, int LinhaIdCartela, int LinhaAcertosCartela, int TipoBusca)
 {
-    int ValorAnterior, ValorAtual, contador = 0;
+    int AcertosCartela = 0, Id_Jogador = 0, Id_Cartela = 0;
+    bool continuaBusca = true;
 
-    for (int coluna = 1; coluna < Colunas; coluna++) // inicia coluna na posicao 1
+    // Pesquisa na Linha
+    switch (TipoBusca)
     {
-        if (coluna < 5)
-        {
-            ValorAtual = MatrizCartelasClone[codLinha, coluna];
-            ValorAnterior = MatrizCartelasClone[codLinha, coluna - 1];
-            if (ValorAtual == ValorAnterior)
+        case 0: // valida LINHA
+            AcertosCartela = 0;
+            for (int col = 0; (col < 5 && continuaBusca); col++)
             {
-                contador++;
-            }
-        }
-    }
-    if (contador == 4 && !LinhaOK)
-    {
-        EncontraJogador = (codLinha / 5); // exemplo 12 / 5 = 2,4
-        codLinha = (int)EncontraJogador; // converte 2,4 para 2
-        codLinha = (codLinha * 5); // multiplica 2 por 5 = linha 10 (linha pai da matriz)
-        Id_JogadorLinha = MatrizCartelasClone[codLinha, 5];
-        Id_CartelaGeral = MatrizCartelasClone[codLinha + 1, 5];
-
-        LinhaOK = true;
-        Bingo = true;
-        Console.WriteLine($"DEU LINHA PARA O JOGADOR {Id_JogadorLinha}! CARTELA: {Id_CartelaGeral}");
-    }
-}
-
-
-void VerificarColuna(int codLinha, int controlePosicao)
-{
-    int ValorAnterior, ValorAtual, contador = 0;
-    int codColuna = 0, codLinhaAux = 0;
-    codLinhaAux = codLinha;
-    // recebo linha, verifico a linha em cada coluna
-    while (codColuna < 5)
-    {
-        switch (controlePosicao)
-        {
-            case 0: // primeira linha de uma cartela
-                for (int i = 1; (i < 5); i++)
+                AcertosCartela = MatrizCartelas[linha, col];
+                if (AcertosCartela < 0)
                 {
-                    codLinhaAux++;
-                    if (codLinhaAux < LinhaTotal)
-                    {
-                        ValorAnterior = MatrizCartelasClone[codLinhaAux - 1, codColuna];
-                        ValorAtual = MatrizCartelasClone[codLinhaAux, codColuna];
-
-                        if (ValorAtual == ValorAnterior)
-                        {
-                            contador++;
-                        }
-                    }
+                    continuaBusca = true;
                 }
-                break;
-            case 1:
-
-                break;
-            case 2:
-
-                break;
-            case 3:
-
-                break;
-            case 4:
-
-                break;
-        }
-        codColuna++;
-    }
-
-
-
-    for (int codcoluna = 0; codcoluna < 5; codcoluna++)
-    {
-        while (codLinha < LinhaTotalAux)
-        {
-            ValorAtual = MatrizCartelasClone[codLinha + 1, codcoluna];
-            ValorAnterior = MatrizCartelasClone[codLinha, codcoluna];
-            if (ValorAtual == ValorAnterior)
-            {
-                contador++;
+                else
+                {
+                    continuaBusca = false;
+                }
             }
-            codLinha++;
-        }
-        LinhaTotalAux += 5;
-    }
-
-    if (contador == 4 && !ColunaOK)
-    {
-        EncontraJogador = (codLinha / 5); // exemplo 12 / 5 = 2,4
-        codLinha = (int)EncontraJogador; // converte 2,4 para 2
-        codLinha = (codLinha * 5); // multiplica 2 por 5 = linha 10 (linha pai da matriz)
-        Id_JogadorLinha = MatrizCartelasClone[codLinha, 5];
-        Id_CartelaGeral = MatrizCartelasClone[codLinha + 1, 5];
-
-        LinhaOK = true;
-        Bingo = true;
-        Console.WriteLine($"DEU LINHA PARA O JOGADOR {Id_JogadorLinha}! CARTELA: {Id_CartelaGeral}");
+            if (continuaBusca && !LinhaOK)
+            {
+                Id_Jogador = MatrizCartelas[LinhaIdJogador, 5];
+                Id_Cartela = MatrizCartelas[LinhaIdCartela, 5];
+                LinhaOK = true;
+                JogadoresRegistrados[Id_Jogador, 2] = JogadoresRegistrados[Id_Jogador, 2] + 1; // Add pontuação na matriz (id jogador, qtde cartelas, pontuacao)
+                Console.WriteLine($"DEU LINHA PARA O JOGADOR {Id_Jogador}! CARTELA: {Id_Cartela}");
+            }
+            break;
+        case 1: // valida COLUNA
+            AcertosCartela = 0;
+            for (int lin = LinhaIdJogador; (lin < LinhaIdJogador + 5 && continuaBusca); lin++)
+            {
+                AcertosCartela = MatrizCartelas[lin, coluna];
+                if (AcertosCartela < 0)
+                {
+                    continuaBusca = true;
+                }
+                else
+                {
+                    continuaBusca = false;
+                }
+            }
+            if (continuaBusca && !ColunaOK)
+            {
+                Id_Jogador = MatrizCartelas[LinhaIdJogador, 5];
+                Id_Cartela = MatrizCartelas[LinhaIdCartela, 5];
+                ColunaOK = true;
+                JogadoresRegistrados[Id_Jogador, 2] = JogadoresRegistrados[Id_Jogador, 2] + 5; // Add pontuação na matriz (id jogador, qtde cartelas, pontuacao)
+                Console.WriteLine($"DEU COLUNA PARA O JOGADOR {Id_Jogador}! NA CARTELA: {Id_Cartela}");
+            }
+            break;
+        case 2:
+            // valida BINGO
+            AcertosCartela = 0;
+            AcertosCartela = MatrizCartelas[LinhaAcertosCartela, 5];
+            if (AcertosCartela == 25)
+            {
+                Id_Jogador = MatrizCartelas[LinhaIdJogador, 5];
+                Id_Cartela = MatrizCartelas[LinhaIdCartela, 5];
+                Bingo = true;
+                JogadoresRegistrados[Id_Jogador, 2] = JogadoresRegistrados[Id_Jogador, 2] + 1; // Add pontuação na matriz (id jogador, qtde cartelas, pontuacao)
+                Console.WriteLine($"BINGO!!!!!!!! PARA O JOGADOR {Id_Jogador}! NA CARTELA: {Id_Cartela}");
+            }
+            break;
     }
 }
-
-
-
-
 
 MenuJogadores();
-ClonarMatrizCartelas();
 EnumerarRoleta();
+imprimirCartelas();
 
-
-// Sorteia
+Console.WriteLine("\nAperte qualquer tecla para realizar os sorteios.");
+Console.ReadKey();
 for (int i = 0; i < 99; i++)
 {
     VerificarSorteado();
 }
-
-
+Console.WriteLine("-------------------");
+imprimirCartelas();
 
 Console.WriteLine("\nSorteados");
 for (int i = 0; i < RoletaSorteados.Length; i++)
 {
     Console.Write(RoletaSorteados[i] + " ");
 }
-
-imprimirCartelas();
 
 Console.ReadKey();
 
