@@ -11,7 +11,6 @@ bool Bingo = false;
 //Vetores
 int[] Roleta = new int[99];
 int[] RoletaSorteados = new int[99];
-int[] RoletaSorteadosLimpa = new int[99];
 int[] RoletaCartela = new int[99];
 //Matrizes
 int[,] MatrizCartelas = new int[5, Colunas];
@@ -331,21 +330,28 @@ void MenuJogadores()
         Console.WriteLine("Quantos jogadores?");
         Jogadores = int.Parse(Console.ReadLine());
     }
+
+    while (QtdeCartela <= 0)
+    {
+        Console.WriteLine($"Quantas cartelas para cada jogador?");
+        QtdeCartela = int.Parse(Console.ReadLine());
+    }
+
     EnumerarCartelas();
     while (Id_Jogador < Jogadores)
     {
-        while (QtdeCartela <= 0)
-        {
-            Console.WriteLine($"Quantas cartelas para o {Id_Jogador + 1}o jogador?");
-            QtdeCartela = int.Parse(Console.ReadLine());
-        }
+        //while (QtdeCartela <= 0)
+        //{
+        //    Console.WriteLine($"Quantas cartelas para o {Id_Jogador + 1}o jogador?");
+        //    QtdeCartela = int.Parse(Console.ReadLine());
+        //}
 
         // Vetor JogadoresRegistrados tem 100 casas (aqui salvo ID JOGADOR e QTDE CARTELAS)
         JogadoresRegistrados[Id_Jogador, 0] = Id_Jogador;
         JogadoresRegistrados[Id_Jogador, 1] = QtdeCartela;
         qtdetotal_temp += QtdeCartela;
         Id_Jogador++;
-        QtdeCartela = 0;
+        //QtdeCartela = 0;
     }
     LinhaTotal = (qtdetotal_temp * 5);
     MatrizCartelas = new int[LinhaTotal, 6];
