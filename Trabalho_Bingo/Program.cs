@@ -11,10 +11,11 @@ bool Bingo = false;
 //Vetores
 int[] Roleta = new int[99];
 int[] RoletaSorteados = new int[99];
+int[] RoletaSorteadosLimpa = new int[99];
 int[] RoletaCartela = new int[99];
 //Matrizes
-int[,] MatrizCartelas = new int[100, Colunas];
-int[,] JogadoresRegistrados = new int[10, 3];
+int[,] MatrizCartelas = new int[5, Colunas];
+int[,] JogadoresRegistrados = new int[100, 3];
 int[,] MatrizNumeros = new int[0, 100];
 int[,] MatrizAcertos = new int[2, 5];
 string[,] MatrizMensagens = new string[3, 5];
@@ -35,7 +36,6 @@ void EnumerarCartelas()
         RoletaCartela[i] = i + 1;
     }
 }
-
 void GeradorCartelas()
 {
     int CartelaJogador = 1, CartelaNumerosLinhas = 0;
@@ -46,7 +46,6 @@ void GeradorCartelas()
         CriarCartelas(CartelaJogador, CartelaNumerosLinhas);
     }
 }
-
 void CriarCartelas(int CartelaJogador, int CartelaNumerosLinhas)
 {
     int CodigoJogadorCartela = 0;
@@ -104,29 +103,34 @@ int PreencherCartelaJogador()
 }
 void imprimirCartelas()
 {
-    int pularlinha = 0;
-
-    Console.WriteLine("\nCartelas dos Jogadores:");
-    for (int linha = 0; linha < LinhaTotal; linha++)
+    int JCartelas = 0, linhaAtual = -1, linhaParada = 0, JColunas = 0, colaux = 0, linaux = 0;
+    // Jogadores
+    for (int JogadorUnico = 0; JogadorUnico < Jogadores; JogadorUnico++)
     {
-        if (pularlinha == 5)
+        JCartelas = JogadoresRegistrados[JogadorUnico, 1];
+        JColunas = (JCartelas * 5);
+        Console.Write($"\n\nCartelas do Jogador {JogadorUnico + 1}\n");
+        for (int lin = 0; lin < 5; lin++)
         {
-            Console.WriteLine();
-            pularlinha = 0;
-        }
-        Console.WriteLine();
-        for (int coluna = 0; coluna < Colunas; coluna++)
-        {
-            if (coluna == 5)
+            linaux = linhaParada;
+            Console.Write("\n");
+            for (int col = 0; col < JColunas; col++)
             {
-                Console.Write("|   [" + MatrizCartelas[linha, coluna].ToString().PadLeft(2, '0') + "]");
+                if (colaux == 5)
+                {
+                    linaux += 5;
+                    colaux = 0;
+                    Console.Write("|   ");
+                }
+                Console.Write("|" + MatrizCartelas[linaux, colaux].ToString().PadLeft(2, '0'));
+                colaux++;
             }
-            else
-            {
-                Console.Write("| " + MatrizCartelas[linha, coluna].ToString().PadLeft(2, '0') + " ");
-            }
+            Console.Write("|   ");
+            linhaParada++;
+            linhaAtual += 2;
+            colaux = 0;
         }
-        pularlinha++;
+        linhaParada = linhaAtual + 1;
     }
 } // ver aqui
 void VerificarSorteado()
@@ -190,24 +194,27 @@ void EfetuarPontuacao(int TipoPontuacao, int indexLinha, int indexColuna, int Li
     int Id_Jogador = 0, Id_Cartela = 0, pontos = 1;
     Id_Jogador = MatrizCartelas[LinhaIdJogador, 5];
     Id_Cartela = MatrizCartelas[LinhaIdCartela, 5];
+
     switch (TipoPontuacao) // TipoPontuacao -  0 = LINHA, 1 = COLUNA
     {
         case 0:
             MatrizAcertos[TipoPontuacao, indexLinha] = 1;   // salva essa LINHA como pontuada
-            MatrizMensagens[TipoPontuacao, indexLinha] = $"DEU LINHA  ({indexLinha + 1}) PARA O JOGADOR {Id_Jogador + 1}! NA CARTELA: {Id_Cartela}";
+            //MatrizMensagens[TipoPontuacao, indexLinha] = $"DEU LINHA  ({indexLinha + 1}) PARA O JOGADOR {Id_Jogador + 1}! NA CARTELA: {Id_Cartela}";
+            Console.WriteLine($"\nDEU LINHA  ({indexLinha + 1}) PARA O JOGADOR {Id_Jogador + 1}! NA CARTELA: {Id_Cartela}");
             break;
         case 1:
             MatrizAcertos[TipoPontuacao, indexColuna] = 1;   // salva essa COLUNA como pontuada
-            MatrizMensagens[TipoPontuacao, indexColuna] = $"DEU COLUNA ({indexColuna + 1}) PARA O JOGADOR {Id_Jogador + 1}! NA CARTELA: {Id_Cartela}";
+            //MatrizMensagens[TipoPontuacao, indexColuna] = $"DEU COLUNA ({indexColuna + 1}) PARA O JOGADOR {Id_Jogador + 1}! NA CARTELA: {Id_Cartela}";
+            Console.WriteLine($"\nDEU COLUNA ({indexColuna + 1}) PARA O JOGADOR {Id_Jogador + 1}! NA CARTELA: {Id_Cartela}");
             break;
         case 2:
-            MatrizMensagens[TipoPontuacao, 0] = $"******************* BINGO ****************\nPARA O JOGADOR {Id_Jogador + 1}! NA CARTELA: {Id_Cartela}";
+            //MatrizMensagens[TipoPontuacao, 0] = $"******************* BINGO ****************\nPARA O JOGADOR {Id_Jogador + 1}! NA CARTELA: {Id_Cartela}";
+            Console.WriteLine($"\n******************* BINGO ****************\nPARA O JOGADOR {Id_Jogador + 1}! NA CARTELA: {Id_Cartela}");
             Bingo = true;
             pontos = 5;
             break;
     }
-    JogadoresRegistrados[Id_Jogador, 2] = JogadoresRegistrados[Id_Jogador, 2] + 1; // Add pontuação para o jogador (id jogador, qtde cartelas, pontuacao)
-
+    JogadoresRegistrados[Id_Jogador, 2] = JogadoresRegistrados[Id_Jogador, 2] + pontos; // Add pontuação para o jogador (id jogador, qtde cartelas, pontuacao)
 }
 void VerificarResultado(int linha, int coluna, int LinhaIdJogador, int LinhaIdCartela, int LinhaAcertosCartela, int indexLinha, int indexColuna)
 {
@@ -263,41 +270,37 @@ void VerificarResultado(int linha, int coluna, int LinhaIdJogador, int LinhaIdCa
 void RealizarSorteio()
 {
     int Jogador = 1, Pontuacao = 0, Qtde = 0;
-    Console.WriteLine("\nAperte qualquer tecla para realizar os sorteios.");
+    imprimirCartelas();
+    Console.WriteLine("\n\nAperte qualquer tecla para realizar os sorteios.");
     Console.ReadKey();
-    Console.Clear();
+    //Console.Clear();
+
     for (int i = 0; i < 99; i++)
     {
         VerificarSorteado();
     }
-
-    for (int linha = 0; linha < Jogadores; linha++)
-    {
-        Jogador = JogadoresRegistrados[linha, 0];
-        Qtde = JogadoresRegistrados[linha, 1];
-        Pontuacao = JogadoresRegistrados[linha, 2];
-        Console.WriteLine();
-        Console.Write($"O Jogador {Jogador + 1} possui {Qtde} Cartelas e fez {Pontuacao} pontos!");
-    }
-
     Console.WriteLine("\n");
     for (int linha = 0; linha < 3; linha++)
     {
         for (int col = 0; col < 5; col++)
         {
-            if (linha == 2 && col == 0)
+            if (MatrizMensagens[linha, col] != null)
             {
-                Console.WriteLine("");
+                Console.WriteLine(MatrizMensagens[linha, col]);
             }
-            Console.WriteLine(MatrizMensagens[linha, col]);
         }
     }
-
-    imprimirCartelas();
-    Console.WriteLine();
-    ImprimeVetor(RoletaSorteados, "\nOrdem dos números que foram sorteados:", 0, RoletaSorteados.Length, 1);
-    ImprimeVetor(Roleta, "\nNúmeros que não foram sorteados:", 0, Roleta.Length, 1);
-
+    Console.Write("");
+    for (int linha = 0; linha < Jogadores; linha++)
+    {
+        Jogador = JogadoresRegistrados[linha, 0];
+        Qtde = JogadoresRegistrados[linha, 1];
+        Pontuacao = JogadoresRegistrados[linha, 2];
+        Console.Write($"\nO Jogador {Jogador + 1} possui {Qtde} Cartelas e fez {Pontuacao} pontos!");
+    }
+    //imprimirCartelas();
+    ImprimeVetor(RoletaSorteados, "\n\nOrdem dos números que foram sorteados:", 0, RoletaSorteados.Length, 1);
+    ImprimeVetor(Roleta, "\n\nNúmeros que não foram sorteados:", 0, Roleta.Length, 1);
     Console.ReadKey();
 }
 void Sortear()
@@ -347,6 +350,8 @@ void MenuJogadores()
     LinhaTotal = (qtdetotal_temp * 5);
     MatrizCartelas = new int[LinhaTotal, 6];
     GeradorCartelas();
+    EnumerarRoleta();
+    RealizarSorteio();
 }
 
 
@@ -386,8 +391,4 @@ void ImprimeVetor(int[] VetorGenerico, string titulo, int param_linhas, int para
     }
 
 }
-
 MenuJogadores();
-EnumerarRoleta();
-imprimirCartelas();
-RealizarSorteio();
