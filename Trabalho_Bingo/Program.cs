@@ -1,10 +1,10 @@
 ﻿//Variaveis
 int ContadorSorteados = 0, Colunas = 6, Jogadores = 0, LinhaCartelaIncremento = 0, LinhaCartelaPessoa = 0;
 int LinhaTotal = 0, Id_Jogador = 0, NroSorteado = 0, ContadorResetNumeros = 0, QtdeCartela = 0, pulaBingo = -1;
-string MensagemPontuacao = "";
 bool Bingo = false;
 //Vetores
 int[] Roleta = new int[99], RoletaSorteados = new int[99], RoletaCartela = new int[99], VetorAcertos = new int[2];
+string[] VetorAcertosMensagens = new string[4];
 //Matrizes
 int[,] MatrizCartelas = new int[5, Colunas], JogadoresRegistrados = new int[20, 3], MatrizNumeros = new int[0, 100];
 //MatrizAcertos = new int[2, 5];
@@ -114,30 +114,30 @@ void Sortear()
             i = new Random().Next(0, 99);                   // Pega um indice aleatorio entre 0 e 99
             Sorteio = Roleta[i];                           // Sorteado recebe o numero da roleta nesse indice
         }
-        RoletaSorteados[ContadorSorteados] = Sorteio;  // Salva o numero sorteado dentro do vetor de sorteados
-        NroSorteado = Sorteio;
-        ContadorSorteados++;                            // Aumenta contador de sorteado (controlador do indice do vetor)
-        Roleta[i] = 0;                                  // Zera o numero no vetor Roleta de origem para que ele nao seja sorteado novamente
-        Sorteou = true;
         if (NroSorteadoAnterior > 0)    // Executa funções para impressão na tela após o sorteio
         {
             if (pulaBingo != 1)
             {
                 Console.Clear();
                 imprimirCartelas();
-                if (MensagemPontuacao != "")
-                {
-                    Console.Write($"\n\n[   {MensagemPontuacao}   ]");
-                    Console.ReadKey();
-                }
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"\n\n[  SORTEIO ATUAL: ( {ContadorSorteados} )  ]");
+                Console.WriteLine($"{VetorAcertosMensagens[0]}");
+                Console.WriteLine($"{VetorAcertosMensagens[1]}"); Console.ResetColor();
                 Console.Write($"\n\nNúmero sorteado nessa rodada:");
                 Console.ForegroundColor = ConsoleColor.Blue;
                 Console.Write($" [{NroSorteadoAnterior.ToString().PadLeft(2, '0')}]");
                 Console.ResetColor();
+                ImprimeVetor(RoletaSorteados, "\nNúmeros sorteados até o momento:", 25, RoletaSorteados.Length);
                 Console.WriteLine("\nAperte qualquer tecla para continuar o sorteio.");
                 Console.ReadKey();
             }
         }
+        RoletaSorteados[ContadorSorteados] = Sorteio;  // Salva o numero sorteado dentro do vetor de sorteados
+        NroSorteado = Sorteio;
+        ContadorSorteados++;                            // Aumenta contador de sorteado (controlador do indice do vetor)
+        Roleta[i] = 0;                                  // Zera o numero no vetor Roleta de origem para que ele nao seja sorteado novamente
+        Sorteou = true;
     }
 }
 void VerificarSorteado()
@@ -145,10 +145,10 @@ void VerificarSorteado()
     int LinhaIdJogador = 0, LinhaIdCartela = 0, LinhaAcertosCartela = 0;
     int NrosAcertados = 0, indexLinha = 0, indexColuna = 0;
     bool NovaCartela = true;
-    while (ContadorSorteados < 99 && !Bingo)
+    while (!Bingo)
     {
         Sortear(); // Enquanto não for bingo e existirem numeros, efetua o sorteio
-        MensagemPontuacao = "";
+        //MensagemPontuacao = "";
         for (int linha = 0; linha < LinhaTotal && !Bingo; linha++) // Varre todas as linhas de todas as cartelas
         {
             if (NovaCartela)    // controle para saber quando uma linha inicia uma cartela nova
@@ -184,6 +184,7 @@ void VerificarSorteado()
 }
 void RealizarSorteio()
 {
+    string TerminarBingo = "";
     imprimirCartelas(); // Imprime as cartelas inicialmente
     Console.WriteLine("\n\nAperte qualquer tecla para realizar os sorteios.");
     Console.ReadKey();
@@ -195,19 +196,27 @@ void RealizarSorteio()
     {
         Console.Clear();
         imprimirCartelas();
-        if (MensagemPontuacao != "")
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine(MensagemPontuacao); Console.ResetColor();
-        }
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine($"{VetorAcertosMensagens[0]}");
+        Console.WriteLine($"{VetorAcertosMensagens[1]}"); Console.ResetColor();
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine(VetorAcertosMensagens[2]); Console.ResetColor();
+        Console.ForegroundColor = ConsoleColor.Blue;
+        Console.WriteLine(VetorAcertosMensagens[3]); Console.ResetColor();
     }
-    ImprimeVetor(RoletaSorteados, "\n\nOrdem dos números que foram sorteados:", 15, RoletaSorteados.Length);
-    ImprimeVetor(Roleta, "\n\nNúmeros que não foram sorteados:", 15, Roleta.Length);
+    ImprimeVetor(RoletaSorteados, "\n\nOrdem dos números que foram sorteados:", 25, 99);
+    ImprimeVetor(Roleta, "\n\nNúmeros que não foram sorteados:", 25, 99);
     Console.ReadKey();
+    while (TerminarBingo != "S")
+    {
+        Console.WriteLine("Digite S para encerrar o jogo.");
+        TerminarBingo = Console.ReadLine();
+    }
 }
 void EfetuarPontuacao(int TipoPontuacao, int indexLinha, int indexColuna, int LinhaIdJogador, int LinhaIdCartela)
 {
     int Id_Jogador = 0, Id_Cartela = 0;
+    string MensagemPontuacao = "";
     Id_Jogador = MatrizCartelas[LinhaIdJogador, 5];
     Id_Cartela = MatrizCartelas[LinhaIdCartela, 5];
 
@@ -216,14 +225,16 @@ void EfetuarPontuacao(int TipoPontuacao, int indexLinha, int indexColuna, int Li
         case 0:
             JogadoresRegistrados[Id_Jogador, 2] = JogadoresRegistrados[Id_Jogador, 2] + 1; // Add pontuação para o jogador (id jogador, qtde cartelas, pontuacao)
             //MatrizAcertos[TipoPontuacao, indexLinha] = 1;   // salva essa LINHA como pontuada
+            //MensagemPontuacao = ($"O JOGADOR {Id_Jogador + 1}, NA CARTELA {Id_Cartela}, PREENCHEU A LINHA {indexLinha + 1} !");
             VetorAcertos[0] = 1;
-            MensagemPontuacao = ($"O JOGADOR {Id_Jogador + 1}, NA CARTELA {Id_Cartela}, PREENCHEU A LINHA {indexLinha + 1} !");
+            VetorAcertosMensagens[0] = ($"\n[ O JOGADOR {Id_Jogador + 1}, NA CARTELA {Id_Cartela}, PREENCHEU A LINHA {indexLinha + 1} AO SORTEAR O NÚMERO {NroSorteado} NO SORTEIO {ContadorSorteados} ! ]");
             break;
         case 1:
             JogadoresRegistrados[Id_Jogador, 2] = JogadoresRegistrados[Id_Jogador, 2] + 1; // Add pontuação para o jogador (id jogador, qtde cartelas, pontuacao)
             //MatrizAcertos[TipoPontuacao, indexColuna] = 1;   // salva essa COLUNA como pontuada
+            //MensagemPontuacao = ($"O JOGADOR {Id_Jogador + 1}, NA CARTELA {Id_Cartela}, PREENCHEU A COLUNA {indexColuna + 1} !");
             VetorAcertos[1] = 1;
-            MensagemPontuacao = ($"O JOGADOR {Id_Jogador + 1}, NA CARTELA {Id_Cartela}, PREENCHEU A COLUNA {indexColuna + 1} !");
+            VetorAcertosMensagens[1] = ($"\n[ O JOGADOR {Id_Jogador + 1}, NA CARTELA {Id_Cartela}, PREENCHEU A COLUNA {indexColuna + 1} AO SORTEAR O NÚMERO {NroSorteado} NO SORTEIO {ContadorSorteados} ! ]");
             break;
         case 2:
             int CodigoJogador, PontoJogador, JogadorVencedor = 0, JogadorVencedorPontos = 0;
@@ -232,11 +243,14 @@ void EfetuarPontuacao(int TipoPontuacao, int indexLinha, int indexColuna, int Li
             JogadoresRegistrados[Id_Jogador, 2] = JogadoresRegistrados[Id_Jogador, 2] + 5; // Add pontuação para o jogador (id jogador, qtde cartelas, pontuacao)
             JogadorNome = JogadoresRegistradosNome[Id_Jogador, 1]; ;
             Bingo = true;
-            MensagemPontuacao += "\n\n\n__________________________________________________\n";
-            MensagemPontuacao += "|$$$$$$$$$$$$$$$ !|B I N G O |! |$$$$$$$$$$$$$$$ |\n";
-            MensagemPontuacao += "|¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯|\n";
+            MensagemPontuacao += "______________________________________________________________________\n";
+            MensagemPontuacao += "|$$$$$$$$$$$$$$$$$$$$$$$$ !| B I N G O |! |$$$$$$$$$$$$$$$$$$$$$$$$$$$ |\n";
+            MensagemPontuacao += "|¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯|\n";
             MensagemPontuacao += $"|       PARA O JOGADOR {Id_Jogador + 1} - {JogadorNome}! NA CARTELA: {Id_Cartela}          \n";
-            MensagemPontuacao += "¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯\n";
+            MensagemPontuacao += $"|                         NO SORTEIO: {ContadorSorteados}            \n";
+            MensagemPontuacao += "¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯\n";
+            VetorAcertosMensagens[2] = MensagemPontuacao;
+            MensagemPontuacao = "";
             // Informa quem pontuou mais no jogo
             for (int linha = 0; linha < Jogadores; linha++)
             {
@@ -249,10 +263,11 @@ void EfetuarPontuacao(int TipoPontuacao, int indexLinha, int indexColuna, int Li
                 }
             }
             JogadorNome = JogadoresRegistradosNome[JogadorVencedor, 1];
-            MensagemPontuacao += $"\n¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯";
+            MensagemPontuacao += $"¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯";
             MensagemPontuacao += $"\nO VENCEDOR DO BINGO É O JOGADOR: {JogadorVencedor + 1} - {JogadorNome} COM INCRÍVEIS: {JogadorVencedorPontos} PONTOS! PARABÉNS!\n";
             MensagemPontuacao += "¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯\n";
-            MensagemPontuacao += "[   Obrigado por jogar! Volte quando quiser =)   ]\n";
+            MensagemPontuacao += "[   Obrigado por jogar! Volte quando quiser :D   ]\n";
+            VetorAcertosMensagens[3] = MensagemPontuacao;
             break;
     }
 }
