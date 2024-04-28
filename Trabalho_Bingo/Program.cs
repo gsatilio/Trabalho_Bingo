@@ -7,6 +7,7 @@ int LinhaCartelaPessoa = 0;     // Controla o codigo da cartela da pessoa
 int LinhaTotal = 0;             // Controla o total de linhas da matriz geral de cartelas
 int Id_Jogador = 0, NroSorteado = 0;
 int ContadorResetNumeros = 0;   // Controla o reset do sorteio para preencher uma cartela
+int QtdeCartela = 0;
 bool Bingo = false;
 //Vetores
 int[] Roleta = new int[99];
@@ -101,43 +102,57 @@ int PreencherCartelaJogador()
 }
 void imprimirCartelas()
 {
-    int JCartelas = 0, linhaParada = 0, JColunas = 0, colaux = 0, linaux = 0, linhaParadaAux = 0;
+    int JCartelas = 0, linhaParada = 0, JColunas = 0, colaux = 0, linaux = 0, linhaParadaAux = 0, ContaCartela = 1;
     for (int JogadorUnico = 0; JogadorUnico < Jogadores; JogadorUnico++)
     {
         JCartelas = JogadoresRegistrados[JogadorUnico, 1];
         JColunas = (JCartelas * 5);
         Console.Write($"\n\nCartelas do Jogador {JogadorUnico + 1}\n");
-        for (int lin = 0; lin < 5; lin++)
+        for (int lin = 0; lin < 6; lin++)
         {
-            linaux = linhaParada;
-            Console.Write("\n");
-            for (int col = 0; col < JColunas; col++)
+            if (lin > 0)
             {
-                if (colaux == 5)
+                linaux = linhaParada;
+                Console.Write("\n");
+                for (int col = 0; col < JColunas; col++)
                 {
-                    linaux += 5;
-                    linhaParadaAux++;
-                    colaux = 0;
-                    Console.Write("|  ");
-                }
-                switch (MatrizCartelas[linaux, colaux])
-                {
-                    case < 0:
-                        Console.Write("|(" + (MatrizCartelas[linaux, colaux] * -1).ToString().PadLeft(2, '0') + ")");
-                        break;
-                    default:
-                        Console.Write("| " + MatrizCartelas[linaux, colaux].ToString().PadLeft(2, '0') + " ");
-                        break;
+                    if (colaux == 5)
+                    {
+                        linaux += 5;
+                        linhaParadaAux++;
+                        colaux = 0;
+                        Console.Write("|  ");
+                    }
 
+                    switch (MatrizCartelas[linaux, colaux])
+                    {
+                        case < 0:
+                            Console.Write("|(" + (MatrizCartelas[linaux, colaux] * -1).ToString().PadLeft(2, '0') + ")");
+                            break;
+                        default:
+                            Console.Write("| " + MatrizCartelas[linaux, colaux].ToString().PadLeft(2, '0') + " ");
+                            break;
+                    }
+                    colaux++;
                 }
-                colaux++;
+                Console.Write("|  ");
+                linhaParada++;
+                colaux = 0;
             }
-            Console.Write("|  ");
-            linhaParada++;
-            colaux = 0;
+            else
+            {
+                for (int col = 0; col < JCartelas; col++)
+                {
+                    Console.Write("   ");
+                    Console.Write($"      Cartela {ContaCartela}");
+                    ContaCartela++;
+                    Console.Write("          ");
+                }
+            }
         }
         linhaParada += linhaParadaAux;
         linhaParadaAux = 0;
+        ContaCartela = 1;
     }
 }
 void VerificarSorteado()
@@ -342,7 +357,6 @@ void ImprimeVetor(int[] VetorGenerico, string titulo, int param_linhas, int para
 }
 void MenuJogadores()
 {
-    int QtdeCartela = 0;
     int qtdetotal_temp = 0;
     while (Jogadores <= 0)
     {
