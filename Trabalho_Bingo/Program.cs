@@ -6,16 +6,10 @@ int LinhaTotal = 0, Id_Jogador = 0, NroSorteado = 0, ContadorResetNumeros = 0, Q
 string MensagemPontuacao = "";
 bool Bingo = false;
 //Vetores
-int[] Roleta = new int[99];
-int[] RoletaSorteados = new int[99];
-int[] RoletaCartela = new int[99];
+int[] Roleta = new int[99], RoletaSorteados = new int[99], RoletaCartela = new int[99];
 //Matrizes
-int[,] MatrizCartelas = new int[5, Colunas];
-int[,] JogadoresRegistrados = new int[20, 3];
+int[,] MatrizCartelas = new int[5, Colunas], JogadoresRegistrados = new int[20, 3], MatrizNumeros = new int[0, 100], MatrizAcertos = new int[2, 5];
 string[,] JogadoresRegistradosNome = new string[20, 2];
-int[,] MatrizNumeros = new int[0, 100];
-int[,] MatrizAcertos = new int[2, 5];
-
 void ImprimeVetor(int[] VetorGenerico, string titulo, int param_linhas, int param_colunas)
 {
     int linha = 0;
@@ -135,6 +129,7 @@ void Sortear()
                 if (MensagemPontuacao != "")
                 {
                     Console.Write($"\n\n[   {MensagemPontuacao}   ]");
+                    Console.ReadKey();
                 }
                 Console.Write($"\n\nNúmero sorteado nessa rodada:");
                 Console.ForegroundColor = ConsoleColor.Blue;
@@ -204,8 +199,7 @@ void RealizarSorteio()
         if (MensagemPontuacao != "")
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine(MensagemPontuacao);
-            Console.ResetColor();
+            Console.WriteLine(MensagemPontuacao); Console.ResetColor();
         }
     }
     ImprimeVetor(RoletaSorteados, "\n\nOrdem dos números que foram sorteados:", 15, RoletaSorteados.Length);
@@ -329,11 +323,9 @@ void imprimirCartelas()
         Console.BackgroundColor = ConsoleColor.Gray; Console.ForegroundColor = ConsoleColor.Black;
         Console.Write($" - Pontuação Atual: ");
         Console.BackgroundColor = ConsoleColor.DarkMagenta; Console.ForegroundColor = ConsoleColor.White;
-        Console.Write($"   {JPontos}   ");
-        Console.ResetColor();
+        Console.Write($"   {JPontos}   "); Console.ResetColor();
         Console.BackgroundColor = ConsoleColor.Gray; Console.ForegroundColor = ConsoleColor.Black;
-        Console.Write($"      ]\n\n");
-        Console.ResetColor();
+        Console.Write($"      ]\n\n"); Console.ResetColor();
         for (int lin = 0; lin < 6; lin++)
         {
             if (lin > 0)
@@ -354,8 +346,7 @@ void imprimirCartelas()
                         case < 0:
                             Console.Write("|");
                             Console.BackgroundColor = ConsoleColor.DarkGreen;
-                            Console.Write(" " + (MatrizCartelas[linaux, colaux] * -1).ToString().PadLeft(2, '0') + " ");
-                            Console.ResetColor();
+                            Console.Write(" " + (MatrizCartelas[linaux, colaux] * -1).ToString().PadLeft(2, '0') + " "); Console.ResetColor();
                             break;
                         default:
                             Console.Write("| " + MatrizCartelas[linaux, colaux].ToString().PadLeft(2, '0') + " ");
@@ -373,8 +364,7 @@ void imprimirCartelas()
                 {
                     Console.Write("         ");
                     Console.BackgroundColor = ConsoleColor.Gray; Console.ForegroundColor = ConsoleColor.Black;
-                    Console.Write($"Cartela {ContaCartela}");
-                    Console.ResetColor();
+                    Console.Write($"Cartela {ContaCartela}"); Console.ResetColor();
                     ContaCartela++;
                     Console.Write("             ");
                 }
