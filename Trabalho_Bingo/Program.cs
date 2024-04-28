@@ -349,7 +349,7 @@ void imprimirCartelas()
         Console.ResetColor();
         Console.BackgroundColor = ConsoleColor.Gray;
         Console.ForegroundColor = ConsoleColor.Black;
-        Console.Write($"      ]\n");
+        Console.Write($"      ]\n\n");
         Console.ResetColor();
         for (int lin = 0; lin < 6; lin++)
         {
@@ -364,7 +364,7 @@ void imprimirCartelas()
                         linaux += 5;
                         linhaParadaAux++;
                         colaux = 0;
-                        Console.Write("| ");
+                        Console.Write("|     ");
                     }
                     switch (MatrizCartelas[linaux, colaux])
                     {
@@ -388,10 +388,13 @@ void imprimirCartelas()
             {
                 for (int col = 0; col < JCartelas; col++)
                 {
-                    Console.Write("   ");
-                    Console.Write($"      Cartela {ContaCartela}");
+                    Console.Write("         ");
+                    Console.BackgroundColor = ConsoleColor.Gray;
+                    Console.ForegroundColor = ConsoleColor.Black;
+                    Console.Write($"Cartela {ContaCartela}");
+                    Console.ResetColor();
                     ContaCartela++;
-                    Console.Write("          ");
+                    Console.Write("             ");
                 }
             }
         }
