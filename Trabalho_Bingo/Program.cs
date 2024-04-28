@@ -4,9 +4,10 @@ int LinhaTotal = 0, Id_Jogador = 0, NroSorteado = 0, ContadorResetNumeros = 0, Q
 string MensagemPontuacao = "";
 bool Bingo = false;
 //Vetores
-int[] Roleta = new int[99], RoletaSorteados = new int[99], RoletaCartela = new int[99];
+int[] Roleta = new int[99], RoletaSorteados = new int[99], RoletaCartela = new int[99], VetorAcertos = new int[2];
 //Matrizes
-int[,] MatrizCartelas = new int[5, Colunas], JogadoresRegistrados = new int[20, 3], MatrizNumeros = new int[0, 100], MatrizAcertos = new int[2, 5];
+int[,] MatrizCartelas = new int[5, Colunas], JogadoresRegistrados = new int[20, 3], MatrizNumeros = new int[0, 100];
+//MatrizAcertos = new int[2, 5];
 string[,] JogadoresRegistradosNome = new string[20, 2];
 void ImprimeVetor(int[] VetorGenerico, string titulo, int param_linhas, int param_colunas)
 {
@@ -214,12 +215,14 @@ void EfetuarPontuacao(int TipoPontuacao, int indexLinha, int indexColuna, int Li
     {
         case 0:
             JogadoresRegistrados[Id_Jogador, 2] = JogadoresRegistrados[Id_Jogador, 2] + 1; // Add pontuação para o jogador (id jogador, qtde cartelas, pontuacao)
-            MatrizAcertos[TipoPontuacao, indexLinha] = 1;   // salva essa LINHA como pontuada
+            //MatrizAcertos[TipoPontuacao, indexLinha] = 1;   // salva essa LINHA como pontuada
+            VetorAcertos[0] = 1;
             MensagemPontuacao = ($"O JOGADOR {Id_Jogador + 1}, NA CARTELA {Id_Cartela}, PREENCHEU A LINHA {indexLinha + 1} !");
             break;
         case 1:
             JogadoresRegistrados[Id_Jogador, 2] = JogadoresRegistrados[Id_Jogador, 2] + 1; // Add pontuação para o jogador (id jogador, qtde cartelas, pontuacao)
-            MatrizAcertos[TipoPontuacao, indexColuna] = 1;   // salva essa COLUNA como pontuada
+            //MatrizAcertos[TipoPontuacao, indexColuna] = 1;   // salva essa COLUNA como pontuada
+            VetorAcertos[1] = 1;
             MensagemPontuacao = ($"O JOGADOR {Id_Jogador + 1}, NA CARTELA {Id_Cartela}, PREENCHEU A COLUNA {indexColuna + 1} !");
             break;
         case 2:
@@ -261,7 +264,8 @@ void VerificarResultado(int linha, int coluna, int LinhaIdJogador, int LinhaIdCa
     // VALIDAR LINHA
     contador = 0;
     AcertosCartela = 0;
-    if (MatrizAcertos[0, indexLinha] == 0) // Verifica no vetor de acertos se alguem ja fez essa LINHA
+    //if (MatrizAcertos[0, indexLinha] == 0) // Verifica no vetor de acertos se alguem ja fez essa LINHA
+    if (VetorAcertos[0] == 0) // Verifica no vetor de acertos se alguem ja fez essa LINHA
     {
         for (int col = 0; (col < 5); col++)
         {
@@ -279,7 +283,8 @@ void VerificarResultado(int linha, int coluna, int LinhaIdJogador, int LinhaIdCa
     // VALIDAR COLUNA
     contador = 0;
     AcertosCartela = 0;
-    if (MatrizAcertos[1, indexColuna] == 0) // Verifica no vetor de acertos se alguem ja fez essa COLUNA
+    //if (MatrizAcertos[1, indexColuna] == 0) // Verifica no vetor de acertos se alguem ja fez essa COLUNA
+    if (VetorAcertos[1] == 0) // Verifica no vetor de acertos se alguem ja fez essa COLUNA
     {
         for (int lin = LinhaIdJogador; (lin < LinhaIdJogador + 5); lin++)
         {
