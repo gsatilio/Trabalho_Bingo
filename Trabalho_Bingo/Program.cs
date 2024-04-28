@@ -1,6 +1,4 @@
 ﻿//Variaveis
-using System.Globalization;
-
 int ContadorSorteados = 0, Colunas = 6, Jogadores = 0, LinhaCartelaIncremento = 0, LinhaCartelaPessoa = 0;
 int LinhaTotal = 0, Id_Jogador = 0, NroSorteado = 0, ContadorResetNumeros = 0, QtdeCartela = 0, pulaBingo = -1;
 string MensagemPontuacao = "";
