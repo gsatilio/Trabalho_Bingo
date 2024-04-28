@@ -1,4 +1,6 @@
 ﻿//Variaveis
+using System.Globalization;
+
 int ContadorSorteados = 0, Colunas = 6, Jogadores = 0, LinhaCartelaIncremento = 0, LinhaCartelaPessoa = 0;
 int LinhaTotal = 0, Id_Jogador = 0, NroSorteado = 0, ContadorResetNumeros = 0, QtdeCartela = 0, pulaBingo = -1;
 string MensagemPontuacao = "";
@@ -14,39 +16,23 @@ string[,] JogadoresRegistradosNome = new string[20, 2];
 int[,] MatrizNumeros = new int[0, 100];
 int[,] MatrizAcertos = new int[2, 5];
 
-void ImprimeVetor(int[] VetorGenerico, string titulo, int param_linhas, int param_colunas, int Customizado)
+void ImprimeVetor(int[] VetorGenerico, string titulo, int param_linhas, int param_colunas)
 {
     int linha = 0;
     Console.WriteLine($"{titulo}");
-    switch (Customizado)
+
+    for (int i = 0; i < param_colunas; i++)
     {
-        case 1:
-            for (int i = 0; i < param_colunas; i++)
+        linha++;
+        if (VetorGenerico[i] > 0)
+        {
+            Console.Write(VetorGenerico[i].ToString().PadLeft(2, '0') + " ");
+            if (param_linhas > 0 && linha == param_linhas)
             {
-                linha++;
-                if (VetorGenerico[i] > 0)
-                {
-                    Console.Write(VetorGenerico[i].ToString().PadLeft(2, '0') + " ");
-                    if (linha == 15)
-                    {
-                        Console.WriteLine();
-                        linha = 0;
-                    }
-                }
+                Console.WriteLine();
+                linha = 0;
             }
-            break;
-        default:
-            for (int i = 0; i < param_colunas; i++)
-            {
-                linha++;
-                Console.Write(VetorGenerico[i].ToString().PadLeft(2, '0') + " ");
-                if (linha == 15)
-                {
-                    Console.WriteLine();
-                    linha = 0;
-                }
-            }
-            break;
+        }
     }
 }
 void EnumerarRoleta()
@@ -149,7 +135,6 @@ void Sortear()
                 if (MensagemPontuacao != "")
                 {
                     Console.Write($"\n\n[   {MensagemPontuacao}   ]");
-                    Console.ReadKey();
                 }
                 Console.Write($"\n\nNúmero sorteado nessa rodada:");
                 Console.ForegroundColor = ConsoleColor.Blue;
@@ -223,8 +208,8 @@ void RealizarSorteio()
             Console.ResetColor();
         }
     }
-    ImprimeVetor(RoletaSorteados, "\n\nOrdem dos números que foram sorteados:", 0, RoletaSorteados.Length, 1);
-    ImprimeVetor(Roleta, "\n\nNúmeros que não foram sorteados:", 0, Roleta.Length, 1);
+    ImprimeVetor(RoletaSorteados, "\n\nOrdem dos números que foram sorteados:", 15, RoletaSorteados.Length);
+    ImprimeVetor(Roleta, "\n\nNúmeros que não foram sorteados:", 15, Roleta.Length);
     Console.ReadKey();
 }
 void EfetuarPontuacao(int TipoPontuacao, int indexLinha, int indexColuna, int LinhaIdJogador, int LinhaIdCartela)
@@ -238,12 +223,12 @@ void EfetuarPontuacao(int TipoPontuacao, int indexLinha, int indexColuna, int Li
         case 0:
             JogadoresRegistrados[Id_Jogador, 2] = JogadoresRegistrados[Id_Jogador, 2] + 1; // Add pontuação para o jogador (id jogador, qtde cartelas, pontuacao)
             MatrizAcertos[TipoPontuacao, indexLinha] = 1;   // salva essa LINHA como pontuada
-            MensagemPontuacao = ($"O JOGADOR {Id_Jogador + 1}, NA CARTELA {Id_Cartela}, ACERTOU A LINHA {indexLinha + 1} !");
+            MensagemPontuacao = ($"O JOGADOR {Id_Jogador + 1}, NA CARTELA {Id_Cartela}, PREENCHEU A LINHA {indexLinha + 1} !");
             break;
         case 1:
             JogadoresRegistrados[Id_Jogador, 2] = JogadoresRegistrados[Id_Jogador, 2] + 1; // Add pontuação para o jogador (id jogador, qtde cartelas, pontuacao)
             MatrizAcertos[TipoPontuacao, indexColuna] = 1;   // salva essa COLUNA como pontuada
-            MensagemPontuacao = ($"O JOGADOR {Id_Jogador + 1}, NA CARTELA {Id_Cartela}, ACERTOU A COLUNA {indexColuna + 1} !");
+            MensagemPontuacao = ($"O JOGADOR {Id_Jogador + 1}, NA CARTELA {Id_Cartela}, PREENCHEU A COLUNA {indexColuna + 1} !");
             break;
         case 2:
             int CodigoJogador, PontoJogador, JogadorVencedor = 0, JogadorVencedorPontos = 0;
@@ -337,18 +322,16 @@ void imprimirCartelas()
         JNome = JogadoresRegistradosNome[JogadorUnico, 1];
         JColunas = (JCartelas * 5);
         Console.ResetColor();
-        Console.BackgroundColor = ConsoleColor.Gray;
-        Console.ForegroundColor = ConsoleColor.Black;
+        Console.BackgroundColor = ConsoleColor.Gray; Console.ForegroundColor = ConsoleColor.Black;
         Console.Write($"\n\n[     Cartelas do Jogador {JogadorUnico + 1} - ");
-        Console.BackgroundColor = ConsoleColor.DarkMagenta;
-        Console.Write($"{JNome}");
-        Console.BackgroundColor = ConsoleColor.Gray;
+        Console.BackgroundColor = ConsoleColor.DarkMagenta; Console.ForegroundColor = ConsoleColor.White;
+        Console.Write($"  {JNome}  ");
+        Console.BackgroundColor = ConsoleColor.Gray; Console.ForegroundColor = ConsoleColor.Black;
         Console.Write($" - Pontuação Atual: ");
-        Console.BackgroundColor = ConsoleColor.DarkMagenta;
+        Console.BackgroundColor = ConsoleColor.DarkMagenta; Console.ForegroundColor = ConsoleColor.White;
         Console.Write($"   {JPontos}   ");
         Console.ResetColor();
-        Console.BackgroundColor = ConsoleColor.Gray;
-        Console.ForegroundColor = ConsoleColor.Black;
+        Console.BackgroundColor = ConsoleColor.Gray; Console.ForegroundColor = ConsoleColor.Black;
         Console.Write($"      ]\n\n");
         Console.ResetColor();
         for (int lin = 0; lin < 6; lin++)
@@ -389,8 +372,7 @@ void imprimirCartelas()
                 for (int col = 0; col < JCartelas; col++)
                 {
                     Console.Write("         ");
-                    Console.BackgroundColor = ConsoleColor.Gray;
-                    Console.ForegroundColor = ConsoleColor.Black;
+                    Console.BackgroundColor = ConsoleColor.Gray; Console.ForegroundColor = ConsoleColor.Black;
                     Console.Write($"Cartela {ContaCartela}");
                     Console.ResetColor();
                     ContaCartela++;
@@ -405,7 +387,7 @@ void imprimirCartelas()
 }
 void MenuJogadores()
 {
-    int qtdetotal_temp = 0;
+    int TotalLinhasTemp = 0;
     string Nome = "";
     while (Jogadores <= 0)
     {
@@ -428,7 +410,7 @@ void MenuJogadores()
             Nome = Console.ReadLine();
         }
         JogadoresRegistradosNome[Id_Jogador, 1] = Nome;
-        qtdetotal_temp += QtdeCartela;
+        TotalLinhasTemp += QtdeCartela;
         Id_Jogador++;
         Nome = "";
     }
@@ -437,7 +419,7 @@ void MenuJogadores()
         Console.WriteLine("Deseja pular o sorteio e ir até o final do bingo?\n0 - Não, quero ver o bingo sendo feito\n1 - Sim, estou com pressa!");
         pulaBingo = int.Parse(Console.ReadLine());
     }
-    LinhaTotal = (qtdetotal_temp * 5);
+    LinhaTotal = (TotalLinhasTemp * 5);
     MatrizCartelas = new int[LinhaTotal, 6];
     CriarCartelas();
     EnumerarRoleta();
